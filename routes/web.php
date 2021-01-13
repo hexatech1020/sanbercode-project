@@ -18,3 +18,17 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+//Route::get('/route-1', 'TestController@route1')->middleware('admin');
+
+
+Route::middleware(['auth','verified.email'])->group(function(){
+    Route::get('/route-1', 'TestController@route1');
+});
+
+
+Route::middleware(['auth','admin'])->group(function(){
+    Route::get('/route-2', 'TestController@route2');
+});
+
+
