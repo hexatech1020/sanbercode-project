@@ -3,38 +3,43 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use App\Models\User;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
-    use AuthenticatesUsers;
-
     /**
-     * Where to redirect users after login.
+     * Handle the incoming request.
      *
-     * @var string
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __invoke(Request $request)
     {
-        $this->middleware('guest')->except('logout');
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required',
+        ]);
+
+        if(!$token = auth()->attempt($request->only('email', 'password'))){
+            return response()->json([
+                'response_code' => '01',
+                'response_message' => 'silahkan cek kembali email & password Anda',
+            ],200);  
+        }
+
+        $data['user'] = $request->user();
+        return response()->json([
+            'response_code' => '00',
+            'response_message' => 'User berhasil Login',
+            'data' => [
+                "token" => $token,
+                "user" => $data['user'],
+            ]
+        ],200);  
+
+        // return response()->json(['token' => $token]);
+        //return response()->json(compact('token'));
+
     }
 }

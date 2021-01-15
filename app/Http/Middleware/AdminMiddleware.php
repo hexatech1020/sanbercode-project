@@ -16,9 +16,17 @@ class AdminMiddleware
      */
     public function handle($request, Closure $next)
     {   
+        // $user = auth()->user();
+        // if($user->isAdmin()){
+        //     return $next($request);
+        // }
+
         if(Auth::user()->isAdmin()){
             return $next($request);
         }
-        abort(403);
+        return response()->json([
+            'message' => 'Anda Bukan Admin',
+        ]);
+
     }
 }
