@@ -19,23 +19,28 @@ class VerificationController extends Controller
     public function __invoke(Request $request)
     {
         //
+        $request->validate(
+            [
+                'otp' => 'required',
+            ]
+        );
+
         $otp = Otp::where('otp', $request->otp)->first();
 
-        if(!$otp){
+        if (!$otp) {
             return response()->json([
                 'response_code' => '01',
                 'response_message' => 'OTP Code tidak di temukan'
-            ],200);
+            ], 200);
         }
 
         $now = Carbon::now();
 
-        if($now > $otp->valid_until){
+        if ($now > $otp->valid_until) {
             return response()->json([
                 'response_code' => '01',
                 'response_message' => 'Kode OTP sudah tidak berlaku, silahkan generate ulang'
-            ],200);
-
+            ], 200);
         }
 
         $user = User::find($otp->user_id);
@@ -48,7 +53,7 @@ class VerificationController extends Controller
         return response()->json([
             'response_code' => '00',
             'response_message' => 'Anda berhasil diverifikasi',
-            'user' => $data['user'],
-        ],200);        
+            'data' => $data,
+        ], 200);
     }
 }

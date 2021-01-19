@@ -26,20 +26,20 @@ Route::namespace('Auth')->group(function(){
     Route::post('logout','LogoutController');
 });
 
-Route::namespace('Profile')->middleware('auth:api')->group(function(){
-    Route::get('profile/get-profile','ProfileController@index');
+Route::namespace('Profile')->middleware(['auth:api','api','verified.email'])->group(function(){
+    Route::get('profile/get-profile','ProfileController@show');
     Route::post('profile/update-profile','ProfileController@update');
     // Route::delete('delete-article/{article}','ArticleController@destroy');
 });
 
 
-Route::namespace('Article')->middleware('auth:api')->group(function(){
-    Route::post('create-new-article','ArticleController@store');
-    Route::patch('update-article/{article}','ArticleController@update');
-    Route::delete('delete-article/{article}','ArticleController@destroy');
-});
+// Route::namespace('Article')->middleware('auth:api')->group(function(){
+//     Route::post('create-new-article','ArticleController@store');
+//     Route::patch('update-article/{article}','ArticleController@update');
+//     Route::delete('delete-article/{article}','ArticleController@destroy');
+// });
 
-Route::get('user','UserController');
+// Route::get('user','UserController');
 
-Route::get('articles/{article}','Article\ArticleController@show');
-Route::get('articles','Article\ArticleController@index');
+// Route::get('articles/{article}','Article\ArticleController@show');
+// Route::get('articles','Article\ArticleController@index');

@@ -11,6 +11,8 @@ use Illuminate\Notifications\Notifiable;
 use App\Traits\UsesUuid;
 use Auth;
 use App\Role;
+use App\Otp;
+use Carbon\Carbon;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -42,10 +44,14 @@ class User extends Authenticatable implements JWTSubject
         static::creating(function ($model){
             $model->role_id = $model->get_user_role_id();
         });
+
+        static::created(function($model){
+            $model->generate_otp_code();
+        });
     }
 
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'photo_profile'
     ];
 
     /**
@@ -85,7 +91,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function isEmailVerified(){
-        if(Auth::user()->email_verified_at !== null){
+        if(Auth::user()->email_verified_at !== null && Auth::user()->password !== null){
             return true;
         }
         return false;
@@ -127,5 +133,21 @@ class User extends Authenticatable implements JWTSubject
     public function getUpdatedAtAttribute($date)
     {
         return \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i:s');
-    }    
+    }
+    
+    public function generate_otp_code(){
+        do{
+            $random = mt_rand(100000,999999);
+            $check = otp::where('otp',$random)->first();
+        }while($check);
+
+        $now = Carbon::now();
+
+        $otp = otp::updateOrCreate(
+            ['user_id' => $this->id],
+            ['otp' => $random, 'valid_until' => $now->addMinutes(5)]
+        );
+
+    
+    }
 }

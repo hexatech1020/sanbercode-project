@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
+use App\Events\UserRegisteredEvent;
 
 class RegisterController extends Controller
 {
@@ -26,24 +27,30 @@ class RegisterController extends Controller
         //     'password' => ['required','min:6'],
         // ]);
 
-        $user = User::create([
-            // 'id' => Str::uuid(),
-            'name' => request('name'),
-            'email' => request('email'),
-        ]);
+        // $user = User::create([
+        //     // 'id' => Str::uuid(),
+        //     'name' => request('name'),
+        //     'email' => request('email'),
+        // ]);
+
+        $data_request = $request->all();
+        $user = User::create($data_request);
+
 
         $data['user'] = $user;
 
-        Otp::create([
-            'otp' => mt_rand(100000, 999999),
-            'user_id' => $user->id,
-            'valid_until' => \Carbon\Carbon::now()->addMinutes(5),
-        ]);
+        event(new UserRegisteredEvent($user));
+
+        // Otp::create([
+        //     'otp' => mt_rand(100000, 999999),
+        //     'user_id' => $user->id,
+        //     'valid_until' => \Carbon\Carbon::now()->addMinutes(5),
+        // ]);
 
         return response()->json([
             'response_code' => '00',
             'response_message' => 'silahkan cek email',
-            'user' => $data['user'],
+            'data' => $data,
         ],200);  
 
         // return new UserResource($user);

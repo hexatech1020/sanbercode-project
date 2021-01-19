@@ -28,15 +28,25 @@ class LoginController extends Controller
             ],200);  
         }
 
-        $data['user'] = $request->user();
+        // $data['user'] = $request->user();
+        // return response()->json([
+        //     'response_code' => '00',
+        //     'response_message' => 'User berhasil Login',
+        //     'data' => [
+        //         "token" => $token,
+        //         "user" => $data['user'],
+        //     ]
+        // ],200);  
+
+        $data['token'] = $token;
+        $data['user'] = auth()->user();
+        
         return response()->json([
             'response_code' => '00',
-            'response_message' => 'User berhasil Login',
-            'data' => [
-                "token" => $token,
-                "user" => $data['user'],
-            ]
-        ],200);  
+            'response_message' => 'user berhasil login',
+            'data' => $data,
+        ],200);
+
 
         // return response()->json(['token' => $token]);
         //return response()->json(compact('token'));
